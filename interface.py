@@ -13,10 +13,13 @@ from logica import (
 
 
 def iniciar_aplicacao():
+    # Carrega os dados ou inicia valores por omissão em memória antes de construir a janela visual
     iniciar_dados()
 
+    # Cria a janela principal da aplicação (root)
     gui = tk.Tk()
     gui.title("Gestão de Notas")
+    # Impede o redimensionamento horizontal e vertical (garante proporções fixas)
     gui.resizable(False, False)
     gui.geometry("450x650")
 
@@ -27,6 +30,7 @@ def iniciar_aplicacao():
     subtitulo = tk.Label(gui, text="Bem-vindo!", font=("Arial", 10))
     subtitulo.pack(pady=(0, 20))
 
+    # Botões de navegação. O parâmetro 'command' associa um clique a uma função para abrir um submenu.
     btn_alunos = tk.Button(gui, text="1. Gestão de Alunos",
                            width=30, height=2, command=menu_gestao_alunos)
     btn_alunos.pack(pady=10)
@@ -53,28 +57,37 @@ def iniciar_aplicacao():
                               width=30, height=2, command=reiniciar_dados)
     btn_reiniciar.pack(pady=10)
 
+    # O comando gui.destroy fecha a janela, o que termina o loop principal e encerra o programa de forma limpa
     btn_sair = tk.Button(gui, text="0. Sair", width=30,
                          height=2, command=gui.destroy)
     btn_sair.pack(pady=10)
 
+    # Inicia o ciclo infinito (event loop) que aguarda que o utilizador clique em algo
     gui.mainloop()
 
 
 def atualizar_treeview_alunos(tree, lista=None):
+    """Limpa e redesenha a tabela (Treeview) de alunos para refletir o estado atual."""
+    # Caso não seja passada uma lista (útil numa pesquisa), usa a lista global 'alunos' do módulo lógica
     if lista is None:
         lista = alunos
+    # Remove todas as linhas atuais da visualização na janela
     for item in tree.get_children():
         tree.delete(item)
+    # Insere iterativamente cada aluno na última linha ("end")
     for a in lista:
         tree.insert("", "end", values=(a["id"], a["nome"]))
 
 
 def menu_gestao_alunos():
+    # Toplevel cria uma janela secundária que flutua independentemente, filha da principal
     janela = tk.Toplevel()
     janela.title("Gestão de Alunos")
     janela.geometry("700x450")
+    # Comportamento modal: força o foco do utilizador a ficar nesta janela e desativa a janela pai
     janela.grab_set()
 
+    # Frames são contentores de layout usados para agrupar as caixas e botões (ajuda na organização geométrica)
     frame_inputs = tk.Frame(janela)
     frame_inputs.pack(pady=10)
 
@@ -89,6 +102,7 @@ def menu_gestao_alunos():
     frame_botoes = tk.Frame(janela)
     frame_botoes.pack(pady=10)
 
+    # A widget Treeview do ttk comporta-se como uma tabela de dados (com colunas e cabeçalhos)
     tree = ttk.Treeview(janela, columns=("ID", "Nome"), show="headings")
     tree.heading("ID", text="ID")
     tree.heading("Nome", text="Nome")
@@ -97,16 +111,20 @@ def menu_gestao_alunos():
     tree.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
     def on_add():
+        # Extrai o valor inserido na caixa 'Nome' do ecrã
         nome = entry_nome.get()
         msg = adicionar_aluno(nome)
+        # Verifica as palavras-chave no texto para emitir uma caixa de pop-up condizente (erro ou info)
         if "ERRO" in msg:
             messagebox.showerror("Erro", msg)
         else:
             messagebox.showinfo("Sucesso", msg)
+        # Recarrega a tabela para tornar visível o aluno criado
         atualizar_treeview_alunos(tree)
 
     def on_edit():
         try:
+            # Tenta forçar o valor de entrada a um número inteiro. Falha disparando o 'except ValueError' caso seja texto.
             id_a = int(entry_id.get())
             novo = entry_nome.get()
             msg = editar_aluno(id_a, novo)
@@ -121,6 +139,7 @@ def menu_gestao_alunos():
     def on_remove():
         try:
             id_a = int(entry_id.get())
+            # Apresenta uma caixa com a opção "Sim/Não" antes de iniciar uma operação destrutiva
             if messagebox.askyesno("Confirmar", f"Tem a certeza que deseja remover o aluno com ID {id_a}?"):
                 msg = remover_aluno(id_a)
                 if "ERRO" in msg:
@@ -289,12 +308,16 @@ def menu_gestao_notas():
     for a in alunos:
         tree_alunos.insert("", "end", values=(a["id"], a["nome"]))
 
+    # Callback/função disparada quando o utilizador clica sobre uma linha na tabela de Alunos
     def on_aluno_select(event):
         selected = tree_alunos.focus()
         if selected:
+            # Acede aos 'values' da Treeview no índice [0], correspondente à coluna ID
             item_id = tree_alunos.item(selected)['values'][0]
+            # Limpa e preenche de forma automática a Entry correspondente para poupar escrita manual
             entry_id_aluno.delete(0, tk.END)
             entry_id_aluno.insert(0, str(item_id))
+    # Associa (bind) a seleção virtual na tabela à respetiva função de clique
     tree_alunos.bind("<<TreeviewSelect>>", on_aluno_select)
 
     # Lista de Disciplinas
@@ -368,6 +391,7 @@ def menu_gestao_notas():
                 return
             for item in tree.get_children():
                 tree.delete(item)
+            # A partir de uma disciplina selecionada cruza e revela todos os alunos através do método notas_da_disciplina
             for res in notas_da_disciplina(id_d):
                 nota = f"{res['nota']:.1f}" if res['nota'] is not None else "(sem nota)"
                 tree.insert("", "end", values=(res["aluno"], nota))
@@ -453,13 +477,17 @@ def menu_relatorios():
     frame_botoes = tk.Frame(janela)
     frame_botoes.pack(pady=10)
 
+    # Instanciação da área de texto, começando no estado inativo (DISABLED) que bloqueia introdução manual de texto
     text_area = tk.Text(janela, state=tk.DISABLED, width=70, height=15)
     text_area.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
     def escrever_texto(texto):
+        # Reativa brevemente a área de texto (NORMAL)
         text_area.config(state=tk.NORMAL)
+        # Apaga o que lá estava, da linha 1 índice de caráter 0 ("1.0") até ao fim (END)
         text_area.delete("1.0", tk.END)
         text_area.insert(tk.END, texto)
+        # Protege o conteúdo, desativando (DISABLED) antes de finalizar
         text_area.config(state=tk.DISABLED)
 
     def on_media_aluno():

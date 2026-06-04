@@ -14,9 +14,11 @@ def iniciar_dados():
     # Carrega dados dos ficheiros CSV ou cria dados iniciais se não existirem.
     global alunos, disciplinas, notas, _proximo_id_aluno, _proximo_id_disciplina
 
-    alunos = ficheiros.carregar_alunos()
-    disciplinas = ficheiros.carregar_disciplinas()
-    notas = ficheiros.carregar_notas()
+    alunos[:] = ficheiros.carregar_alunos()
+    disciplinas[:] = ficheiros.carregar_disciplinas()
+
+    notas.clear()
+    notas.update(ficheiros.carregar_notas())
 
     if not alunos:
         nomes_iniciais = ["To", "Ze", "Bery", "Manel", "Leo"]
@@ -37,9 +39,9 @@ def iniciar_dados():
 def reset():
     """Reinicia todos os dados e apaga os ficheiros."""
     global alunos, disciplinas, notas, _proximo_id_aluno, _proximo_id_disciplina
-    alunos = []
-    disciplinas = []
-    notas = {}
+    alunos.clear()
+    disciplinas.clear()
+    notas.clear()
     _proximo_id_aluno = 1
     _proximo_id_disciplina = 1
     ficheiros.guardar_alunos(alunos)
@@ -71,8 +73,13 @@ def remover_aluno(id_aluno):
     aluno = obter_aluno_por_id(id_aluno)
     if not aluno:
         return "ERRO: Aluno não encontrado."
-    alunos = [a for a in alunos if a["id"] != id_aluno]
-    notas = {k: v for k, v in notas.items() if k[0] != id_aluno}
+
+    alunos[:] = [a for a in alunos if a["id"] != id_aluno]
+
+    notas_novas = {k: v for k, v in notas.items() if k[0] != id_aluno}
+    notas.clear()
+    notas.update(notas_novas)
+
     ficheiros.guardar_alunos(alunos)
     ficheiros.guardar_notas(notas)
     return f"SUCESSO: Aluno '{aluno['nome']}' removido."
@@ -139,8 +146,13 @@ def remover_disciplina(id_disc):
     disc = obter_disciplina_por_id(id_disc)
     if not disc:
         return "ERRO: Disciplina não encontrada."
-    disciplinas = [d for d in disciplinas if d["id"] != id_disc]
-    notas = {k: v for k, v in notas.items() if k[1] != id_disc}
+
+    disciplinas[:] = [d for d in disciplinas if d["id"] != id_disc]
+
+    notas_novas = {k: v for k, v in notas.items() if k[1] != id_disc}
+    notas.clear()
+    notas.update(notas_novas)
+
     ficheiros.guardar_disciplinas(disciplinas)
     ficheiros.guardar_notas(notas)
     return f"SUCESSO: Disciplina '{disc['nome']}' removida."

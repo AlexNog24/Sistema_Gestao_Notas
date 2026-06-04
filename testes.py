@@ -77,7 +77,8 @@ def teste_pesquisar_alunos():
     logica.adicionar_aluno("Mariana")
     logica.adicionar_aluno("João")
     resultado = logica.pesquisar_alunos_por_nome("mari")
-    assert len(resultado) == 2, f"Esperava 2 resultados, obteve {len(resultado)}"
+    assert len(
+        resultado) == 2, f"Esperava 2 resultados, obteve {len(resultado)}"
     print("  [OK] teste_pesquisar_alunos")
 
 
@@ -88,7 +89,8 @@ def teste_listar_alunos_ordenados():
     logica.adicionar_aluno("Manel")
     ordenados = logica.listar_alunos_ordenados("nome")
     nomes = [a["nome"] for a in ordenados]
-    assert nomes == sorted(nomes, key=str.lower), f"Lista não está ordenada: {nomes}"
+    assert nomes == sorted(
+        nomes, key=str.lower), f"Lista não está ordenada: {nomes}"
     print("  [OK] teste_listar_alunos_ordenados")
 
 

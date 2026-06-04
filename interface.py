@@ -1,13 +1,20 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import logica
+from logica import (
+    alunos, disciplinas, adicionar_aluno, editar_aluno, remover_aluno,
+    pesquisar_alunos_por_nome, listar_alunos_ordenados, adicionar_disciplina,
+    editar_disciplina, remover_disciplina, pesquisar_disciplinas_por_nome,
+    listar_disciplinas_ordenadas, atribuir_nota, obter_aluno_por_id,
+    notas_do_aluno, obter_disciplina_por_id, notas_da_disciplina,
+    media_aluno, media_disciplina, resumo_geral, reset
+)
 
 # ---- FUNÇÕES DE INTERFACE GRÁFICA ----
 
 
 def atualizar_treeview_alunos(tree, lista=None):
     if lista is None:
-        lista = logica.alunos
+        lista = alunos
     for item in tree.get_children():
         tree.delete(item)
     for a in lista:
@@ -43,7 +50,7 @@ def menu_gestao_alunos():
 
     def on_add():
         nome = entry_nome.get()
-        msg = logica.adicionar_aluno(nome)
+        msg = adicionar_aluno(nome)
         if "ERRO" in msg:
             messagebox.showerror("Erro", msg)
         else:
@@ -54,7 +61,7 @@ def menu_gestao_alunos():
         try:
             id_a = int(entry_id.get())
             novo = entry_nome.get()
-            msg = logica.editar_aluno(id_a, novo)
+            msg = editar_aluno(id_a, novo)
             if "ERRO" in msg:
                 messagebox.showerror("Erro", msg)
             else:
@@ -67,7 +74,7 @@ def menu_gestao_alunos():
         try:
             id_a = int(entry_id.get())
             if messagebox.askyesno("Confirmar", f"Tem a certeza que deseja remover o aluno com ID {id_a}?"):
-                msg = logica.remover_aluno(id_a)
+                msg = remover_aluno(id_a)
                 if "ERRO" in msg:
                     messagebox.showerror("Erro", msg)
                 else:
@@ -78,11 +85,11 @@ def menu_gestao_alunos():
 
     def on_search():
         termo = entry_nome.get()
-        res = logica.pesquisar_alunos_por_nome(termo)
+        res = pesquisar_alunos_por_nome(termo)
         atualizar_treeview_alunos(tree, res)
 
     def on_list_alpha():
-        res = logica.listar_alunos_ordenados("nome")
+        res = listar_alunos_ordenados("nome")
         atualizar_treeview_alunos(tree, res)
 
     tk.Button(frame_botoes, text="Adicionar", width=10,
@@ -101,7 +108,7 @@ def menu_gestao_alunos():
 
 def atualizar_treeview_disciplinas(tree, lista=None):
     if lista is None:
-        lista = logica.disciplinas
+        lista = disciplinas
     for item in tree.get_children():
         tree.delete(item)
     for d in lista:
@@ -137,7 +144,7 @@ def menu_gestao_disciplinas():
 
     def on_add():
         nome = entry_nome.get()
-        msg = logica.adicionar_disciplina(nome)
+        msg = adicionar_disciplina(nome)
         if "ERRO" in msg:
             messagebox.showerror("Erro", msg)
         else:
@@ -148,7 +155,7 @@ def menu_gestao_disciplinas():
         try:
             id_d = int(entry_id.get())
             novo = entry_nome.get()
-            msg = logica.editar_disciplina(id_d, novo)
+            msg = editar_disciplina(id_d, novo)
             if "ERRO" in msg:
                 messagebox.showerror("Erro", msg)
             else:
@@ -161,7 +168,7 @@ def menu_gestao_disciplinas():
         try:
             id_d = int(entry_id.get())
             if messagebox.askyesno("Confirmar", f"Tem a certeza que deseja remover a disciplina com ID {id_d}?"):
-                msg = logica.remover_disciplina(id_d)
+                msg = remover_disciplina(id_d)
                 if "ERRO" in msg:
                     messagebox.showerror("Erro", msg)
                 else:
@@ -172,11 +179,11 @@ def menu_gestao_disciplinas():
 
     def on_search():
         termo = entry_nome.get()
-        res = logica.pesquisar_disciplinas_por_nome(termo)
+        res = pesquisar_disciplinas_por_nome(termo)
         atualizar_treeview_disciplinas(tree, res)
 
     def on_list_alpha():
-        res = logica.listar_disciplinas_ordenadas("nome")
+        res = listar_disciplinas_ordenadas("nome")
         atualizar_treeview_disciplinas(tree, res)
 
     tk.Button(frame_botoes, text="Adicionar", width=10,
@@ -196,7 +203,7 @@ def menu_gestao_disciplinas():
 def menu_gestao_notas():
     janela = tk.Toplevel()
     janela.title("Gestão de Notas")
-    janela.geometry("700x450")
+    janela.geometry("800x600")
     janela.grab_set()
 
     frame_inputs = tk.Frame(janela)
@@ -216,6 +223,55 @@ def menu_gestao_notas():
     entry_nota = tk.Entry(frame_inputs, width=10)
     entry_nota.grid(row=0, column=5, padx=5, pady=5)
 
+    frame_listas = tk.Frame(janela)
+    frame_listas.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
+
+    # Lista de Alunos
+    frame_alunos = tk.Frame(frame_listas)
+    frame_alunos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
+    tk.Label(frame_alunos, text="Lista de Alunos",
+             font=("Arial", 10, "bold")).pack(pady=5)
+    tree_alunos = ttk.Treeview(frame_alunos, columns=(
+        "ID", "Nome"), show="headings", height=5)
+    tree_alunos.heading("ID", text="ID")
+    tree_alunos.heading("Nome", text="Nome")
+    tree_alunos.column("ID", width=50, anchor=tk.CENTER)
+    tree_alunos.column("Nome", width=150, anchor=tk.W)
+    tree_alunos.pack(fill=tk.BOTH, expand=True)
+    for a in alunos:
+        tree_alunos.insert("", "end", values=(a["id"], a["nome"]))
+
+    def on_aluno_select(event):
+        selected = tree_alunos.focus()
+        if selected:
+            item_id = tree_alunos.item(selected)['values'][0]
+            entry_id_aluno.delete(0, tk.END)
+            entry_id_aluno.insert(0, str(item_id))
+    tree_alunos.bind("<<TreeviewSelect>>", on_aluno_select)
+
+    # Lista de Disciplinas
+    frame_disc = tk.Frame(frame_listas)
+    frame_disc.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(5, 0))
+    tk.Label(frame_disc, text="Lista de Disciplinas",
+             font=("Arial", 10, "bold")).pack(pady=5)
+    tree_disc = ttk.Treeview(frame_disc, columns=(
+        "ID", "Nome"), show="headings", height=5)
+    tree_disc.heading("ID", text="ID")
+    tree_disc.heading("Nome", text="Nome")
+    tree_disc.column("ID", width=50, anchor=tk.CENTER)
+    tree_disc.column("Nome", width=150, anchor=tk.W)
+    tree_disc.pack(fill=tk.BOTH, expand=True)
+    for d in disciplinas:
+        tree_disc.insert("", "end", values=(d["id"], d["nome"]))
+
+    def on_disc_select(event):
+        selected = tree_disc.focus()
+        if selected:
+            item_id = tree_disc.item(selected)['values'][0]
+            entry_id_disc.delete(0, tk.END)
+            entry_id_disc.insert(0, str(item_id))
+    tree_disc.bind("<<TreeviewSelect>>", on_disc_select)
+
     frame_botoes = tk.Frame(janela)
     frame_botoes.pack(pady=10)
 
@@ -231,7 +287,7 @@ def menu_gestao_notas():
             id_a = int(entry_id_aluno.get())
             id_d = int(entry_id_disc.get())
             nota = float(entry_nota.get())
-            msg = logica.atribuir_nota(id_a, id_d, nota)
+            msg = atribuir_nota(id_a, id_d, nota)
             if "ERRO" in msg:
                 messagebox.showerror("Erro", msg)
             else:
@@ -243,13 +299,13 @@ def menu_gestao_notas():
     def on_consultar_aluno():
         try:
             id_a = int(entry_id_aluno.get())
-            aluno = logica.obter_aluno_por_id(id_a)
+            aluno = obter_aluno_por_id(id_a)
             if not aluno:
                 messagebox.showerror("Erro", "Aluno não encontrado.")
                 return
             for item in tree.get_children():
                 tree.delete(item)
-            for res in logica.notas_do_aluno(id_a):
+            for res in notas_do_aluno(id_a):
                 nota = f"{res['nota']:.1f}" if res['nota'] is not None else "(sem nota)"
                 tree.insert("", "end", values=(res["disciplina"], nota))
         except ValueError:
@@ -258,13 +314,13 @@ def menu_gestao_notas():
     def on_consultar_disc():
         try:
             id_d = int(entry_id_disc.get())
-            disc = logica.obter_disciplina_por_id(id_d)
+            disc = obter_disciplina_por_id(id_d)
             if not disc:
                 messagebox.showerror("Erro", "Disciplina não encontrada.")
                 return
             for item in tree.get_children():
                 tree.delete(item)
-            for res in logica.notas_da_disciplina(id_d):
+            for res in notas_da_disciplina(id_d):
                 nota = f"{res['nota']:.1f}" if res['nota'] is not None else "(sem nota)"
                 tree.insert("", "end", values=(res["aluno"], nota))
         except ValueError:
@@ -281,7 +337,7 @@ def menu_gestao_notas():
 def menu_relatorios():
     janela = tk.Toplevel()
     janela.title("Relatórios")
-    janela.geometry("700x450")
+    janela.geometry("800x600")
     janela.grab_set()
 
     frame_inputs = tk.Frame(janela)
@@ -296,6 +352,55 @@ def menu_relatorios():
         row=0, column=2, padx=5, pady=5)
     entry_id_disc = tk.Entry(frame_inputs, width=10)
     entry_id_disc.grid(row=0, column=3, padx=5, pady=5)
+
+    frame_listas = tk.Frame(janela)
+    frame_listas.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
+
+    # Lista de Alunos
+    frame_alunos = tk.Frame(frame_listas)
+    frame_alunos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
+    tk.Label(frame_alunos, text="Lista de Alunos",
+             font=("Arial", 10, "bold")).pack(pady=5)
+    tree_alunos = ttk.Treeview(frame_alunos, columns=(
+        "ID", "Nome"), show="headings", height=5)
+    tree_alunos.heading("ID", text="ID")
+    tree_alunos.heading("Nome", text="Nome")
+    tree_alunos.column("ID", width=50, anchor=tk.CENTER)
+    tree_alunos.column("Nome", width=150, anchor=tk.W)
+    tree_alunos.pack(fill=tk.BOTH, expand=True)
+    for a in alunos:
+        tree_alunos.insert("", "end", values=(a["id"], a["nome"]))
+
+    def on_aluno_select(event):
+        selected = tree_alunos.focus()
+        if selected:
+            item_id = tree_alunos.item(selected)['values'][0]
+            entry_id_aluno.delete(0, tk.END)
+            entry_id_aluno.insert(0, str(item_id))
+    tree_alunos.bind("<<TreeviewSelect>>", on_aluno_select)
+
+    # Lista de Disciplinas
+    frame_disc = tk.Frame(frame_listas)
+    frame_disc.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(5, 0))
+    tk.Label(frame_disc, text="Lista de Disciplinas",
+             font=("Arial", 10, "bold")).pack(pady=5)
+    tree_disc = ttk.Treeview(frame_disc, columns=(
+        "ID", "Nome"), show="headings", height=5)
+    tree_disc.heading("ID", text="ID")
+    tree_disc.heading("Nome", text="Nome")
+    tree_disc.column("ID", width=50, anchor=tk.CENTER)
+    tree_disc.column("Nome", width=150, anchor=tk.W)
+    tree_disc.pack(fill=tk.BOTH, expand=True)
+    for d in disciplinas:
+        tree_disc.insert("", "end", values=(d["id"], d["nome"]))
+
+    def on_disc_select(event):
+        selected = tree_disc.focus()
+        if selected:
+            item_id = tree_disc.item(selected)['values'][0]
+            entry_id_disc.delete(0, tk.END)
+            entry_id_disc.insert(0, str(item_id))
+    tree_disc.bind("<<TreeviewSelect>>", on_disc_select)
 
     frame_botoes = tk.Frame(janela)
     frame_botoes.pack(pady=10)
@@ -312,11 +417,11 @@ def menu_relatorios():
     def on_media_aluno():
         try:
             id_a = int(entry_id_aluno.get())
-            aluno = logica.obter_aluno_por_id(id_a)
+            aluno = obter_aluno_por_id(id_a)
             if not aluno:
                 messagebox.showerror("Erro", "Aluno não encontrado.")
                 return
-            m = logica.media_aluno(id_a)
+            m = media_aluno(id_a)
             if m is None:
                 escrever_texto(
                     f"O aluno '{aluno['nome']}' não tem notas registadas.\n")
@@ -329,11 +434,11 @@ def menu_relatorios():
     def on_media_disc():
         try:
             id_d = int(entry_id_disc.get())
-            disc = logica.obter_disciplina_por_id(id_d)
+            disc = obter_disciplina_por_id(id_d)
             if not disc:
                 messagebox.showerror("Erro", "Disciplina não encontrada.")
                 return
-            m = logica.media_disciplina(id_d)
+            m = media_disciplina(id_d)
             if m is None:
                 escrever_texto(f"Sem notas registadas em '{disc['nome']}'.\n")
             else:
@@ -342,7 +447,7 @@ def menu_relatorios():
             messagebox.showerror("Erro", "ID da disciplina inválido.")
 
     def on_resumo():
-        r = logica.resumo_geral()
+        r = resumo_geral()
         linhas = [
             f"Total de alunos      : {r['total_alunos']}",
             f"Total de disciplinas : {r['total_disciplinas']}",
@@ -371,13 +476,5 @@ def menu_relatorios():
 
 def reiniciar_dados():
     if messagebox.askyesno("Confirmar", "Tem a certeza que quer apagar todos os dados?"):
-        logica.reset()
+        reset()
         messagebox.showinfo("Sucesso", "Sistema reiniciado com sucesso.")
-
-
-def menu_principal():
-    """
-    Função mantida para compatibilidade. Se executar o main.py, 
-    ele fará o redirecionamento automático para a interface Tkinter.
-    """
-    import tkinterEXP

@@ -6,10 +6,58 @@ from logica import (
     editar_disciplina, remover_disciplina, pesquisar_disciplinas_por_nome,
     listar_disciplinas_ordenadas, atribuir_nota, obter_aluno_por_id,
     notas_do_aluno, obter_disciplina_por_id, notas_da_disciplina,
-    media_aluno, media_disciplina, resumo_geral, reset
+    media_aluno, media_disciplina, resumo_geral, reset, iniciar_dados
 )
 
 # ---- FUNÇÕES DE INTERFACE GRÁFICA ----
+
+
+def iniciar_aplicacao():
+    iniciar_dados()
+
+    gui = tk.Tk()
+    gui.title("Gestão de Notas")
+    gui.resizable(False, False)
+    gui.geometry("450x650")
+
+    titulo = tk.Label(
+        gui, text="SISTEMA DE GESTÃO DE NOTAS", font=("Arial", 12, "bold"))
+    titulo.pack(pady=(25, 5))
+
+    subtitulo = tk.Label(gui, text="Bem-vindo!", font=("Arial", 10))
+    subtitulo.pack(pady=(0, 20))
+
+    btn_alunos = tk.Button(gui, text="1. Gestão de Alunos",
+                           width=30, height=2, command=menu_gestao_alunos)
+    btn_alunos.pack(pady=10)
+
+    btn_disciplinas = tk.Button(gui,
+                                command=menu_gestao_disciplinas,
+                                text="2. Gestão de Disciplinas",
+                                width=30,
+                                height=2)
+    btn_disciplinas.pack(pady=10)
+
+    btn_notas = tk.Button(gui,
+                          command=menu_gestao_notas,
+                          text="3. Gestão de Notas",
+                          width=30,
+                          height=2)
+    btn_notas.pack(pady=10)
+
+    btn_relatorios = tk.Button(gui, text="4. Relatórios",
+                               width=30, height=2, command=menu_relatorios)
+    btn_relatorios.pack(pady=10)
+
+    btn_reiniciar = tk.Button(gui, text="5. Reiniciar Dados",
+                              width=30, height=2, command=reiniciar_dados)
+    btn_reiniciar.pack(pady=10)
+
+    btn_sair = tk.Button(gui, text="0. Sair", width=30,
+                         height=2, command=gui.destroy)
+    btn_sair.pack(pady=10)
+
+    gui.mainloop()
 
 
 def atualizar_treeview_alunos(tree, lista=None):

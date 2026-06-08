@@ -32,13 +32,18 @@ def iniciar_dados():
 
     # Caso não existam alunos (primeira execução), introduz alguns dados de exemplo.
     if not alunos:
-        nomes_iniciais = ["To", "Ze", "Bery", "Manel", "Leo"]
+        nomes_iniciais = ["Alexandre",
+                          "Vicente"]
         for nome in nomes_iniciais:
             adicionar_aluno(nome)
 
     # O mesmo raciocínio para as disciplinas, gerando disciplinas base se estiver vazio.
     if not disciplinas:
-        discs_iniciais = ["Mat", "Pt", "Prog", "Ing", "Fcsi"]
+        discs_iniciais = ["Matemática", "Português",
+                          "Programação", "Inglês", "Fcsi",
+                          "Programação II", "Ferramentas e Multimédia",
+                          "Hardware de Computadores", "Redes",
+                          "Eng. Software", "Base de Dados"]
         for nome in discs_iniciais:
             adicionar_disciplina(nome)
 
@@ -238,9 +243,11 @@ def atribuir_nota(id_aluno, id_disc, valor):
     valor deve ser float entre 0 e 20.
     """
     # Garante que as referências ao aluno e disciplina são válidas antes de registar a nota.
-    if not obter_aluno_por_id(id_aluno):
+    aluno = obter_aluno_por_id(id_aluno)
+    if not aluno:
         return "ERRO: Aluno não encontrado."
-    if not obter_disciplina_por_id(id_disc):
+    disc = obter_disciplina_por_id(id_disc)
+    if not disc:
         return "ERRO: Disciplina não encontrada."
     # Validação do intervalo esperado
     if valor < 0 or valor > 20:
@@ -249,8 +256,6 @@ def atribuir_nota(id_aluno, id_disc, valor):
     # Adiciona a nota ou atualiza uma já existente se for novamente atribuída
     notas[(id_aluno, id_disc)] = valor
     ficheiros.guardar_notas(notas)
-    aluno = obter_aluno_por_id(id_aluno)
-    disc = obter_disciplina_por_id(id_disc)
     return f"SUCESSO: Nota {valor:.1f} registada para '{aluno['nome']}' em '{disc['nome']}'."
 
 

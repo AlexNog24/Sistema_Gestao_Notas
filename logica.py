@@ -71,7 +71,6 @@ def reset():
 def adicionar_aluno(nome):
     """Adiciona um aluno. Retorna mensagem de sucesso ou erro."""
     global _proximo_id_aluno
-    # Remove espaços em branco antes e depois do nome
     nome = nome.strip()
     # Validação: impede que seja criado um aluno com um nome vazio
     if not nome:
@@ -246,7 +245,7 @@ def atribuir_nota(id_aluno, id_disc, valor):
     # Validação do intervalo esperado
     if valor < 0 or valor > 20:
         return "ERRO: Nota inválida. Deve estar entre 0 e 20."
-    
+
     # Adiciona a nota ou atualiza uma já existente se for novamente atribuída
     notas[(id_aluno, id_disc)] = valor
     ficheiros.guardar_notas(notas)

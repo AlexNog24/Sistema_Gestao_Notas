@@ -71,11 +71,10 @@ def adicionar_aluno(nome):
         if a["nome"].lower() == nome.lower():
             return f"ERRO: Já existe um aluno com o nome '{nome}'."
 
-    # Procura o menor ID disponível (reutiliza IDs apagados)
-    ids_existentes = {a["id"] for a in alunos}
+    # O novo ID será sempre o maior ID existente + 1 (não preenche buracos)
     novo_id = 1
-    while novo_id in ids_existentes:
-        novo_id += 1
+    if alunos:
+        novo_id = max(a["id"] for a in alunos) + 1
 
     # Cria e guarda o dicionário que representa o aluno
     aluno = {"id": novo_id, "nome": nome}
@@ -161,11 +160,10 @@ def adicionar_disciplina(nome):
         if d["nome"].lower() == nome.lower():
             return f"ERRO: Já existe uma disciplina com o nome '{nome}'."
 
-    # Procura o menor ID disponível
-    ids_existentes = {d["id"] for d in disciplinas}
+    # O novo ID será sempre o maior ID existente + 1
     novo_id = 1
-    while novo_id in ids_existentes:
-        novo_id += 1
+    if disciplinas:
+        novo_id = max(d["id"] for d in disciplinas) + 1
 
     disc = {"id": novo_id, "nome": nome}
     disciplinas.append(disc)

@@ -38,8 +38,21 @@ def test_adicionar_aluno():
         "Alexandre")  # Nome já existe (ID 1)
 
 
+def test_incremento_id_aluno():
+    setup_teste()
+    # A base de dados inicia com IDs 1 e 2. Vamos remover o ID 1.
+    logica.remover_aluno(1)
+    # Adicionar um novo aluno; ele deve receber o ID 3 (maior ID existente que é 2, + 1).
+    logica.adicionar_aluno("Carlos")
+    aluno = logica.obter_aluno_por_id(3)
+    assert aluno is not None
+    assert aluno["nome"] == "Carlos"
+    assert logica.obter_aluno_por_id(1) is None
+
+
 def test_remover_aluno():
     setup_teste()
+    # Remover por ID numérico
     assert "SUCESSO" in logica.remover_aluno(1)
     assert "ERRO" in logica.remover_aluno(999)
 
@@ -66,6 +79,18 @@ def test_adicionar_disciplina():
     assert "SUCESSO" in logica.adicionar_disciplina("Física Avançada")
     assert "ERRO" in logica.adicionar_disciplina("Matemática")
     assert "ERRO" in logica.adicionar_disciplina("")
+
+
+def test_incremento_id_disciplina():
+    setup_teste()
+    # A base de dados inicia com 11 disciplinas (IDs 1 a 11). Vamos remover o ID 1.
+    logica.remover_disciplina(1)
+    # Ao adicionar uma nova, deve receber o ID 12 (maior ID existente que é 11, + 1).
+    logica.adicionar_disciplina("Física Computacional")
+    disc = logica.obter_disciplina_por_id(12)
+    assert disc is not None
+    assert disc["nome"] == "Física Computacional"
+    assert logica.obter_disciplina_por_id(1) is None
 
 
 def test_remover_disciplina():

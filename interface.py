@@ -179,7 +179,7 @@ def menu_gestao_alunos():
               command=on_edit).grid(row=0, column=1, padx=5)
     tk.Button(frame_botoes, text="Remover", width=10,
               command=on_remove).grid(row=0, column=2, padx=5)
-    tk.Button(frame_botoes, text="Pesquisar", width=10,
+    tk.Button(frame_botoes, text="Atualizar", width=10,
               command=on_search).grid(row=0, column=3, padx=5)
     tk.Button(frame_botoes, text="Ordem Alfabética", width=15,
               command=on_list_alpha).grid(row=0, column=4, padx=5)
@@ -273,7 +273,7 @@ def menu_gestao_disciplinas():
               command=on_edit).grid(row=0, column=1, padx=5)
     tk.Button(frame_botoes, text="Remover", width=10,
               command=on_remove).grid(row=0, column=2, padx=5)
-    tk.Button(frame_botoes, text="Pesquisar", width=10,
+    tk.Button(frame_botoes, text="Atualizar", width=10,
               command=on_search).grid(row=0, column=3, padx=5)
     tk.Button(frame_botoes, text="Ordem Alfabética", width=15,
               command=on_list_alpha).grid(row=0, column=4, padx=5)

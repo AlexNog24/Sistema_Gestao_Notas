@@ -23,8 +23,6 @@ def setup_teste():
     logica.alunos.clear()
     logica.disciplinas.clear()
     logica.notas.clear()
-    logica._proximo_id_aluno = 1
-    logica._proximo_id_disciplina = 1
 
     # Carregar dados padrão (2 alunos predefinidos e 11 disciplinas)
     logica.iniciar_dados()

@@ -9,9 +9,6 @@ alunos = []
 disciplinas = []
 # O dicionário de notas usa um tuplo como chave (id_aluno, id_disciplina) e a nota numérica como valor.
 notas = {}  # chave: (id_aluno, id_disciplina) -> float
-# Variáveis de controlo para gerar IDs únicos e incrementais para novos registos.
-_proximo_id_aluno = 1
-_proximo_id_disciplina = 1
 
 
 # ---- INICIALIZAÇÃO ----
@@ -19,7 +16,7 @@ _proximo_id_disciplina = 1
 def iniciar_dados():
     # Carrega dados dos ficheiros CSV ou cria dados iniciais se não existirem.
     # A declaração 'global' permite modificar as variáveis de estado definidas ao nível do módulo.
-    global alunos, disciplinas, notas, _proximo_id_aluno, _proximo_id_disciplina
+    global alunos, disciplinas, notas
 
     # Atualiza as listas em memória com os dados lidos dos ficheiros CSV usando slicing [:]
     # O slicing garante que substituímos os elementos da lista sem criar um novo objeto em memória.
@@ -47,24 +44,14 @@ def iniciar_dados():
         for nome in discs_iniciais:
             adicionar_disciplina(nome)
 
-    # Recalcula as variáveis de próximo ID com base no ID mais elevado encontrado nos dados carregados.
-    # Isto evita conflitos (IDs repetidos) ao adicionar novos elementos após fechar e reabrir a aplicação.
-    if alunos:
-        _proximo_id_aluno = max(a["id"] for a in alunos) + 1
-    if disciplinas:
-        _proximo_id_disciplina = max(d["id"] for d in disciplinas) + 1
-
 
 def reset():
     """Reinicia todos os dados e apaga os ficheiros."""
-    global alunos, disciplinas, notas, _proximo_id_aluno, _proximo_id_disciplina
+    global alunos, disciplinas, notas
     # Esvazia os dados em memória
     alunos.clear()
     disciplinas.clear()
     notas.clear()
-    # Repõe os IDs para 1
-    _proximo_id_aluno = 1
-    _proximo_id_disciplina = 1
     # Ao guardar coleções vazias nos ficheiros, estamos efetivamente a limpar o seu conteúdo
     ficheiros.guardar_alunos(alunos)
     ficheiros.guardar_disciplinas(disciplinas)
@@ -75,7 +62,6 @@ def reset():
 
 def adicionar_aluno(nome):
     """Adiciona um aluno. Retorna mensagem de sucesso ou erro."""
-    global _proximo_id_aluno
     nome = nome.strip()
     # Validação: impede que seja criado um aluno com um nome vazio
     if not nome:
@@ -84,11 +70,16 @@ def adicionar_aluno(nome):
     for a in alunos:
         if a["nome"].lower() == nome.lower():
             return f"ERRO: Já existe um aluno com o nome '{nome}'."
+
+    # Procura o menor ID disponível (reutiliza IDs apagados)
+    ids_existentes = {a["id"] for a in alunos}
+    novo_id = 1
+    while novo_id in ids_existentes:
+        novo_id += 1
+
     # Cria e guarda o dicionário que representa o aluno
-    aluno = {"id": _proximo_id_aluno, "nome": nome}
+    aluno = {"id": novo_id, "nome": nome}
     alunos.append(aluno)
-    # Incrementa o contador para que o próximo aluno receba um ID diferente
-    _proximo_id_aluno += 1
     # Grava a alteração para persistir no disco
     ficheiros.guardar_alunos(alunos)
     return f"SUCESSO: Aluno '{nome}' adicionado com ID {aluno['id']}."
@@ -162,7 +153,6 @@ def listar_alunos_ordenados(criterio="nome"):
 
 def adicionar_disciplina(nome):
     """Adiciona uma disciplina. Retorna mensagem de sucesso ou erro."""
-    global _proximo_id_disciplina
     # Lógica idêntica à de adicionar aluno
     nome = nome.strip()
     if not nome:
@@ -170,9 +160,15 @@ def adicionar_disciplina(nome):
     for d in disciplinas:
         if d["nome"].lower() == nome.lower():
             return f"ERRO: Já existe uma disciplina com o nome '{nome}'."
-    disc = {"id": _proximo_id_disciplina, "nome": nome}
+
+    # Procura o menor ID disponível
+    ids_existentes = {d["id"] for d in disciplinas}
+    novo_id = 1
+    while novo_id in ids_existentes:
+        novo_id += 1
+
+    disc = {"id": novo_id, "nome": nome}
     disciplinas.append(disc)
-    _proximo_id_disciplina += 1
     ficheiros.guardar_disciplinas(disciplinas)
     return f"SUCESSO: Disciplina '{nome}' adicionada com ID {disc['id']}."
 

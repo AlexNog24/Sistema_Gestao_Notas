@@ -11,11 +11,14 @@ ficheiros.FICHEIRO_NOTAS = "teste_notas.csv"
 
 def setup_teste():
     """
-    Como não usamos fixtures, esta função tem de ser chamada no início de cada teste.
-    Apaga os ficheiros de teste anteriores, limpa a memória e inicializa os dados padrão.
+    Como não usamos fixtures, esta função tem de ser chamada no
+    início de cada teste.
+    Apaga os ficheiros de teste anteriores, limpa a memória e inicializa
+    os dados padrão.
     """
     # Apagar ficheiros temporários para garantir um estado sempre limpo
-    for f in [ficheiros.FICHEIRO_ALUNOS, ficheiros.FICHEIRO_DISCIPLINAS, ficheiros.FICHEIRO_NOTAS]:
+    for f in [ficheiros.FICHEIRO_ALUNOS, ficheiros.FICHEIRO_DISCIPLINAS,
+              ficheiros.FICHEIRO_NOTAS]:
         if os.path.exists(f):
             os.remove(f)
 

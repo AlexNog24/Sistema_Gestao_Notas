@@ -37,8 +37,9 @@ def iniciar_dados():
     # O mesmo raciocínio para as disciplinas, gerando disciplinas base se estiver vazio.
     if not disciplinas:
         discs_iniciais = ["Matemática", "Português",
-                          "Programação", "Inglês", "Fcsi",
-                          "Programação II", "Ferramentas e Multimédia",
+                          "Programação I", "Inglês", "FCSI",
+                          "Sistemas Operativos", "Programação II",
+                          "Ferramentas e Multimédia",
                           "Hardware de Computadores", "Redes",
                           "Eng. Software", "Base de Dados"]
         for nome in discs_iniciais:

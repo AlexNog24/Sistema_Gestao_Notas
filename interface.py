@@ -21,7 +21,7 @@ def iniciar_aplicacao():
     gui.title("Gestão de Notas")
     # Impede o redimensionamento horizontal e vertical (garante proporções fixas)
     gui.resizable(False, False)
-    gui.geometry("450x650")
+    gui.geometry("450x575")
 
     titulo = tk.Label(
         gui, text="SISTEMA DE GESTÃO DE NOTAS", font=("Arial", 12, "bold"))
